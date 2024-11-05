@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearCart } from "../../../redux/features/cart/cartSlice";
 
 const OrderSummary = () => {
+  // eslint-disable-next-line no-unused-vars
   const products= useSelector((store)=> store.cart.products);
   const {selectedItems,totalPrice,tax,taxRate,grandTotal} =useSelector((store)=>store.cart)
 
