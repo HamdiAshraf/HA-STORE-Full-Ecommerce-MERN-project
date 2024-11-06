@@ -1,10 +1,10 @@
 
-const express=require("express");
-const mongoose=require('mongoose');
-require("dotenv").config()
-const cors=require("cors")
-
-const cookieParser = require("cookie-parser");
+import express from "express";
+import mongoose from 'mongoose';
+import dotenv from "dotenv";
+import cors from"cors"
+dotenv.config(); 
+import cookieParser from "cookie-parser";
 
 const app=express();
 const PORT=process.env.PORT || 3000;
@@ -18,6 +18,9 @@ app.use(cors({
     credentials:true
 }))
 
+//all routes
+import authRoutes from "./src/users/users.route.js";
+app.use("/api/auth",authRoutes);
 
 //db connection
 mongoose.connect(process.env.DB_URL)
