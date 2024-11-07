@@ -68,10 +68,35 @@ router.post("/login",async(req,res)=>{
     }
 })
 
+router.post("/logout",verifyToken,(req,res)=>{
+    res.clearCookie('token');
+    res.status(200).json({status:"success",message:"logged out successfully"})
+})
 
+router.delete("/users/:id",verifyToken,async(req,res)=>{
+    try {
+        const {id} =req.params;
+        const user=await User.findByIdAndDelete(id)
+        if(!user){
+            return res.status(404).json({status:"fail",message:"user not found"})
+        }
+        res.status(200).json({status:"success",message:"deleted user successfully"})
+        
+
+    } catch (error) {
+        console.error("Error while deleteing user: ",err)
+        res.status(500).json({status:"error",message:err.message}) 
+    }
+})
 
 router.get("/users",verifyToken,async(req,res)=>{
-    res.status(200).json("protected routes")
+    try {
+        const users=await User.find({},"id email role").sort({createdAt:-1});
+        res.status(200).json({status:"success",message:"fetch all users successfully",data:users})
+    } catch (error) {
+        console.error("Error while fetch all users: ",err)
+        res.status(500).json({status:"error",message:err.message}) 
+    }
 })
 
 
