@@ -1,19 +1,39 @@
+/* eslint-disable no-unused-vars */
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { useDispatch } from "react-redux"
+import { Link, useNavigate } from "react-router-dom"
+import { useLoginUserMutation } from "../redux/features/auth/authApi"
+import { toast } from 'react-toastify'; 
 
 
 const Login = () => {
-    // eslint-disable-next-line no-unused-vars
+    
     const [message,setMessage]=useState("")
     const [email,setEmail]=useState("")
     const[password,setPassword]=useState("")
-    const handleLogin=(e)=>{
+
+
+    const dispatch=useDispatch();
+    const [loginUser,{isLoading}]=useLoginUserMutation()
+    const navigate=useNavigate();
+
+    const handleLogin=async(e)=>{
         e.preventDefault()
         const data={
             email,
             password
         }
-        console.log(data);
+        
+        try {
+          const response =await loginUser(data).unwrap();
+          toast.success("Login successful!");
+          navigate("/");
+       
+        } catch (error) {
+          console.error("Login failed:", error);
+          setMessage('please provide a valid email and password')
+          toast.error("Login failed! Please try again.");
+        }
         
     }
   return (

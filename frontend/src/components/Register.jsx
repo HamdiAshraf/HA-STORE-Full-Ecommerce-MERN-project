@@ -1,21 +1,40 @@
+/* eslint-disable no-unused-vars */
 import { useState } from "react"
-import { Link } from "react-router-dom"
-
+import { useDispatch } from "react-redux"
+import { Link, useNavigate } from "react-router-dom"
+import { useRegisterUserMutation } from "../redux/features/auth/authApi"
+import { toast } from 'react-toastify'; 
 
 const Register = () => {
-   // eslint-disable-next-line no-unused-vars
+   
    const [message,setMessage]=useState("")
    const [username,setUsername]=useState("")
    const [email,setEmail]=useState("")
    const[password,setPassword]=useState("")
-   const handleRegister=(e)=>{
+
+   const dispatch=useDispatch();
+   const [registerUser,{isLoading}]=useRegisterUserMutation()
+   const navigate=useNavigate();
+
+   const handleRegister=async(e)=>{
        e.preventDefault()
        const data={
         username,
            email,
            password
        }
-       console.log(data);
+       
+
+       try {
+        const response=await registerUser(data).unwrap()
+        toast.success("Register successful!");
+        navigate("/login")
+
+       } catch (error) {
+        console.error("register failed:", error);
+          setMessage("registeration failed")
+          toast.error("Register failed! Please try again.");
+       }
        
    }
  return (
