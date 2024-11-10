@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux"
 import { Link, useNavigate } from "react-router-dom"
 import { useLoginUserMutation } from "../redux/features/auth/authApi"
 import { toast } from 'react-toastify'; 
+import {setUser} from "../redux/features/auth/authSlice"
 
 
 const Login = () => {
@@ -19,13 +20,15 @@ const Login = () => {
 
     const handleLogin=async(e)=>{
         e.preventDefault()
-        const data={
+        const loginData={
             email,
             password
         }
         
         try {
-          const response =await loginUser(data).unwrap();
+          const response =await loginUser(loginData).unwrap();
+          const {token,data}=response;
+          dispatch(setUser({user:data}));
           toast.success("Login successful!");
           navigate("/");
        
