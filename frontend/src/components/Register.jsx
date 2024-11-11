@@ -33,7 +33,7 @@ const Register = () => {
        } catch (error) {
         console.error("register failed:", error);
           setMessage("registeration failed")
-          toast.error("Register failed! Please try again.");
+          
        }
        
    }
