@@ -20,7 +20,11 @@ app.use(cors({
 
 //all routes
 import authRoutes from "./src/users/users.route.js";
+import productRoutes from "./src/products/products.route.js";
+
 app.use("/api/auth",authRoutes);
+app.use("/api/products",productRoutes);
+
 
 //db connection
 mongoose.connect(process.env.DB_URL)
