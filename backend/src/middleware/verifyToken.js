@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 export const verifyToken=(req,res,next)=>{
     try {
         const token= req.cookies.token;
+        // const token = req.headers["Authorization"].split(" ")[1];
         if(!token){
             res.status(401).json({status:"fail",message:"invalid token"})
         }
