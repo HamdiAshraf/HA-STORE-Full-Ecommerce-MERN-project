@@ -1,8 +1,9 @@
 
-import { useEffect, useState } from "react";
-import productsData from "../../data/products.json";
+import {  useState } from "react";
+
 import ProductCards from "./ProductCards";
 import ShopFiltering from "./ShopFiltering";
+import { useFetchAllProductsQuery } from "../../redux/features/products/productsApi";
 
 const filters={
     categories:['all','accessories','dress','jewellery','cosmetics'],
@@ -16,45 +17,55 @@ const filters={
 }
 
 const ShopPage = () => {
-    const [products,setProducts] =useState(productsData);
+
     const [filtersState,setFiltersState]=useState({
         category:'all',
         color:'all',
         priceRange:''
     })
 
-    //filtering function
-    const applyFilters=()=>{
-        let filteredProducts = productsData;
-        //filter by category
-        if(filtersState.category && filtersState.category!=='all'){
-            filteredProducts = filteredProducts.filter(product=> product.category===filtersState.category);
-        }
-        //filter by color
-        if(filtersState.color && filtersState.color!=='all'){
-            filteredProducts=filteredProducts.filter(product=>product.color===filtersState.color);
-        }
-        //filter by price range
-        if(filtersState.priceRange){
-            const [minPrice,maxPrice] = filtersState.priceRange.split('-').map(Number);
-            filteredProducts=filteredProducts.filter(product=> product.price>=minPrice && product.price<=maxPrice);
-        }
+    const [currentPage,setCurrentPage]=useState(1);
+    const ProductsPerPage=useState(8)
 
-        setProducts(filteredProducts)
+    const {category,color,priceRange} =filtersState;
+    const [minPrice,maxPrice]=priceRange.split("-").map(Number);
 
-    }
 
-    useEffect(()=>{
-        applyFilters();
-   
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[filtersState])
+    const {data, error, isLoading} =useFetchAllProductsQuery({
+      category:category!=="all"?category:'',
+      color:color!=="all"?color:'',
+      minPrice:isNaN(minPrice)?'':minPrice,
+      maxPrice:isNaN(maxPrice)?'':maxPrice,
+      page:currentPage,
+      limit:ProductsPerPage
+    })
 
+    const products = data?.data || [];
+    const totalPages = data?.totalPages || 0;
+    const totalProducts = data?.totalProducts || 0
+
+    
     const clearFilters=()=>{
         setFiltersState({ 
             category:'all',
             color:'all',
             priceRange:''})
+    }
+
+
+    if(isLoading) return <div>Loading...</div>
+    if(error) return <div>Error Loading Products</div>
+
+    const startProduct = (currentPage - 1) * ProductsPerPage + 1;
+    const endProduct = startProduct + products.length - 1;
+    
+
+    
+
+    const handlePageChange=(pageNumber)=>{
+      if(pageNumber>0 && pageNumber<=totalPages){
+        setCurrentPage(pageNumber);
+      }
     }
   return (
 <>
@@ -74,8 +85,29 @@ const ShopPage = () => {
 
       {/* Right Side */}
       <div > 
-        <h3 className="text-xl font-medium mb-4">Products Available: {products.length}</h3>
+        <h3 className="text-xl font-medium mb-4">Showing {startProduct} to {endProduct} of {totalProducts} products</h3>
         <ProductCards products={products} />
+
+        {/* pagination controls */}
+        <div className="mt-6 flex justify-center">
+            <button 
+            disabled={currentPage===1}
+            onClick={()=>handlePageChange(currentPage -1)}
+            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md mr-2">Previous</button>
+            {
+              [...Array(totalPages)].map((_,index)=>(
+                <button 
+                onClick={()=>handlePageChange(index + 1)}
+                className={`px-4 py-2 ${currentPage===index+1?'bg-blue-500 text-white':'bg-gray-300 text-gray-700'} rounded-md mx-1 `}
+                key={index}>{index+1}</button>
+              ))
+            }
+            <button
+            disabled={currentPage===totalPages} 
+            onClick={()=>handlePageChange(currentPage +1)}
+            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md ml-2">Next</button>
+
+        </div>
       </div>
     </div>
   </section>
