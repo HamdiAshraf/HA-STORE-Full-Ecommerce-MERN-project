@@ -1,56 +1,71 @@
-import { Link } from 'react-router-dom'
-import RatingStars from '../../components/RatingStars'
-import { useDispatch } from 'react-redux'
-import { addToCart } from '../../redux/features/cart/cartSlice'
+/* eslint-disable react/prop-types */
+import { Link } from 'react-router-dom';
+import RatingStars from '../../components/RatingStars';
+import { useDispatch } from 'react-redux';
+import { addToCart } from '../../redux/features/cart/cartSlice';
 
-// eslint-disable-next-line react/prop-types
+
 const ProductCards = ({ products }) => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const handleAddToCart = (product) => {
-    dispatch(addToCart(product))
-  }
+    dispatch(addToCart(product));
+  };
+
+  
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
       {
-        // eslint-disable-next-line react/prop-types
-        products.map((product, index) => (
-          <div key={index} className="product__card">
-            <div className="relative">
-              <Link to={`/shop/${product._id}`}>
-                <img
-                  src={product.image}
-                  alt="product image"
-                  className="max-h-96 md:h-64 w-full object-cover hover:scale-105 transition-all duration-300"
-                />
-              </Link>
+        products?.length > 0 ? (
+          products.map((product, index) => {
+            // Ensure each product is defined and has necessary properties
+            if (!product || !product._id || !product.name || !product.price || !product.image) {
+              console.error('Invalid product data:', product);
+              return null; // Skip rendering this product if it's invalid
+            }
 
-              <div className="hover:block absolute top-3 right-3">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleAddToCart(product)
-                  }}
-                >
-                  <i className="ri-shopping-cart-2-line bg-primary p-1.5 text-white hover:bg-primary-dark"></i>
-                </button>{' '}
-              </div>
+            // Safe rendering of product details
+            return (
+              <div key={index} className="product__card">
+                <div className="relative">
+                  <Link to={`/shop/${product._id}`}>
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="max-h-96 md:h-64 w-full object-cover hover:scale-105 transition-all duration-300"
+                    />
+                  </Link>
 
-              {/* Product Description  */}
-              <div className="product__card__content">
-                <h4>{product.name}</h4>
-                <p>
-                  {product.price}{' '}
-                  {product.oldPrice ? <s>{product.oldPrice}</s> : null}
-                </p>
-                <RatingStars rating={product.rating} />
+                  <div className="hover:block absolute top-3 right-3">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAddToCart(product);
+                      }}
+                    >
+                      <i className="ri-shopping-cart-2-line bg-primary p-1.5 text-white hover:bg-primary-dark"></i>
+                    </button>{' '}
+                  </div>
+
+                  {/* Product Description */}
+                  <div className="product__card__content">
+                    <h4>{product.name}</h4>
+                    <p>
+                      {product.price}{' '}
+                      {product.oldPrice ? <s>{product.oldPrice}</s> : null}
+                    </p>
+                    <RatingStars rating={product.rating} />
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        ))
+            );
+          })
+        ) : (
+          <div>No products available</div>
+        )
       }
     </div>
-  )
-}
+  );
+};
 
-export default ProductCards
+export default ProductCards;
