@@ -21,9 +21,13 @@ app.use(cors({
 //all routes
 import authRoutes from "./src/users/users.route.js";
 import productRoutes from "./src/products/products.route.js";
+import reviewRoutes from "./src/reviews/reviews.router.js";
+
 
 app.use("/api/auth",authRoutes);
 app.use("/api/products",productRoutes);
+app.use("/api/reviews",reviewRoutes);
+
 
 
 //db connection
